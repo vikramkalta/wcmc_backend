@@ -10,6 +10,7 @@ SECRET=SECRET12345
 API LIST:
 
 Post country data:
+Use country-data.json file as input to this api to dump all the data in mongodb.
 http://localhost:3001/api/country-data/bulk-all
 
 Get country names:
