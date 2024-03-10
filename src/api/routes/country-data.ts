@@ -12,9 +12,9 @@ export default (app: Router): void => {
   app.use('/country-data', route);
 
   /**
-    * @api {get} /country-names Get track list.
-    * @apiName Get track list.
-    * @apiGroup Track
+    * @api {get} /countries Get countries list.
+    * @apiName Get countries list.
+    * @apiGroup CountryData
     * 
     * @apiSuccess {Boolean} success Determines the status of an API.
     * @apiSuccess {Object} data Data object holding main response data.
@@ -24,10 +24,7 @@ export default (app: Router): void => {
     *     HTTP/1.1 200 OK
     *     {
     *         "success": true,
-    *         "data": [{
-    *             "_id": "123",
-    *             "trackUrl": "https://.soundcloud.com/dave_the_drummer"
-    *         }]
+    *         "data": ['United Kingdom', 'United States of America', 'Estonia']
     *     }
    */
   route.get('/countries', middlewares.logger, middlewares.authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
@@ -40,6 +37,22 @@ export default (app: Router): void => {
     }
   });
 
+  /**
+    * @api {get} /metrics Get metrics.
+    * @apiName Get metrics.
+    * @apiGroup CountryData
+    * 
+    * @apiSuccess {Boolean} success Determines the status of an API.
+    * @apiSuccess {Object} data Data object holding main response data.
+    * @apiSuccess {Boolean} data.success Determines operation's result.
+    *
+    * @apiSuccessExample {json} Success Response:
+    *     HTTP/1.1 200 OK
+    *     {
+    *         "success": true,
+    *         "data": [{}]
+    *     }
+   */
   route.get('/metrics', middlewares.logger, middlewares.authMiddleware, celebrate({
     query: Joi.object({
       country: Joi.string().required(),
@@ -55,9 +68,9 @@ export default (app: Router): void => {
   });
 
   /**
-    * @api {delete} /track Delete track.
-    * @apiName Delete track.
-    * @apiGroup Track
+    * @api {post} /bulk-all Create country data in bulk
+    * @apiName Create country data in bulk
+    * @apiGroup CountryData
     * 
     * @apiSuccess {Boolean} success Determines the status of an API.
     * @apiSuccess {Object} data Data object holding main response data.
@@ -72,18 +85,7 @@ export default (app: Router): void => {
     *         }
     *     }
    */
-  // route.delete('/', middlewares.logger, async (req: Request, res: Response, next: NextFunction) => {
-  //   try {
-  //     const trackService = new TrackService();
-  //     const result = await trackService.deleteTrack({ _id: req.body.id });
-  //     return res.send(result);
-  //   } catch (error) {
-  //     log.error('Error in delete track route', error);
-  //     return next(error);
-  //   }
-  // });
-
-  route.post('/bulk-all', middlewares.logger, async (req: Request, res: Response, next: NextFunction) => {
+  route.post('/bulk-all', middlewares.logger, middlewares.authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = await CountryDataService.createCountryDataBulk(req.body);
       return res.send(result);
